@@ -32,6 +32,7 @@ window.addEventListener('load', function(){
 
         update(deltaTime) {
             this.background.update();
+            this.player.update(this.input.keys, deltaTime);
             //handle enemies
             if (this.enemyTimer > this.enemyInterval) {
                 this.addEnemy();
@@ -43,7 +44,6 @@ window.addEventListener('load', function(){
                 enemy.update(deltaTime);
                 if (enemy.markedForDeletion) this.enemies.splice(this.enemies.indexOf(enemy), 1)
             })
-            this.player.update(this.input.keys, deltaTime);
         }
 
         draw(context) {
