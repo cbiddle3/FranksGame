@@ -1,4 +1,4 @@
-import { Sitting, Running, Jumping, Falling } from "./playerStates.js";
+import { Sitting, Running, Jumping, Falling, Rolling } from "./playerStates.js";
 
 export class Player {
     constructor(game) {
@@ -11,21 +11,23 @@ export class Player {
         this.height = 91.3;
         this.x = 0;
         this. y = this.game.height - this.height - this.game.groundMargin;
-        this.speed = 0;
+        this.speed = 100;
         this.maxSpeed = 10;
         this.maxFrame;
         this.fps = 20;
         this.frameInterval = 1000/this.fps;
         this.frameTimer = 0;
         this.weight = 1;
-        this.states = [new Sitting(this), new Running(this), new Jumping(this), new Falling(this)];
+        this.states = [new Sitting(this), new Running(this), new Jumping(this), new Falling(this), new Rolling(this)];
         this.currentState = this.states[0];
         this.currentState.enter();
     }
 
     update(input, deltaTime) {
+        this.checkCollision();
         this.currentState.handleInput(input);
         //horizontial movement
+        
         this.x += this.speed;
         if (input.includes('ArrowRight')) this.speed = this.maxSpeed;
         else if (input.includes('ArrowLeft')) this.speed = -this.maxSpeed;
@@ -49,6 +51,7 @@ export class Player {
     }
 
     draw(context) {
+        if (this.game.debug) context.strokeRect(this.x, this.y, this.width, this.height);
         context.drawImage(this.image, this.frameX*this.width, this.frameY*this.height, this.width, this.height, this.x, this.y, this.width, this.height); 
     }
 
@@ -58,7 +61,22 @@ export class Player {
 
     setState(state, speed) {
         this.currentState = this.states[state];
+        console.log(state);
         this.game.speed = this.game.maxSpeed * speed;
         this.currentState.enter();
+    }
+
+    checkCollision() {
+        this.game.enemies.forEach(enemy => {
+            if (enemy.x < this.x + this.width &&
+                enemy.x + enemy.width > this.x &&
+                enemy.y < this.y + this.height &&
+                enemy.y + enemy.height > this.y) {
+                    enemy.markedForDeletion = true;
+                    this.game.score += 1;
+            } else {
+
+            }
+        })
     }
 }
